@@ -1,10 +1,10 @@
 export default class Payment {
-    constructor(subject) {
-        this.paymentSubject = this.paymentSubject
+    constructor(paymentSubject) {
+        this.paymentSubject = paymentSubject
     }
 
-    creditCard(paymentData) {
-        console.log(`\na payment occurred ${payment.description}`);
-        this.paymentSubject.notify(paymentData)
+    creditCard({ id, userName, age }) {
+        console.log(`\na payment occurred ${userName}`);
+        this.paymentSubject.notify({ id, userName, age })
     }
 }
