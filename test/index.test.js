@@ -10,7 +10,15 @@ describe("Test Suite for Observer Pattern", () => {
         const observer = {
             update: jest.fn()
         }
+        const data = "Hello World"
+        const expected = data
+
+        subject.subscribe(observer)
+        subject.notify(data)
+
+        expect(observer.update).toBeCalledWith(expected)
     })
+
     test.todo("#PaymentSubject should not notify unsubscribed observers")
     test.todo("#PaymentSubject should notify subject after a credit card transaction")
     test.todo("#All should notify subscribe after a credit card payment")
