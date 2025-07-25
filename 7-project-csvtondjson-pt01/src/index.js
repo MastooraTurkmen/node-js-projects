@@ -28,6 +28,7 @@ const csvToNDJSON = new CSVToNDJSON({
     headers: ['id', 'name', 'desc', 'age'],
 })
 
+const startedAt = Date.now()
 await pipeline(
     createReadStream(fileName),
     csvToNDJSON,
@@ -35,3 +36,11 @@ await pipeline(
     reporter.progress(fileSize),
     createWriteStream('big.ndjson')
 )
+
+const A_MILLISECOND = 1000
+const A_MINUTE = 60
+
+const timeInSecond = Math.round((Date.now() - startedAt) / A_MILLISECOND).toFixed(2)
+const finalTime = timeInSecond > A_MILLISECOND ? `${timeInSecond / A_MINUTE}m` : `${timeInSecond}s`
+
+log(`took: ${finalTime} - process finished with success! `)
