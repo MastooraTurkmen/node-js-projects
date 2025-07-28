@@ -1,12 +1,19 @@
 import ComponentBuilder from "./componentBuilder.js";
 
 let components
+let abortController = getController()
+let active = false
+const MAX_ITEMS_VISIBLE = 35
+
+function getController() {
+    return new AbortController()
+}
 
 function addMessageOnTop(msg) {
     const table = components.table
 
     const { content } = table.items.shift()
-    const items = table.items.map(item => item.content)
+    const items = table.items.slice(0, MAX_ITEMS_VISIBLE).map(item => item.content)
     table.clearItems()
 
     // we put the title first on the top
@@ -23,16 +30,22 @@ function log(msg) {
     addMessageOnTop(msg)
 }
 
-function renderUi() {
+function renderUi(initializeFn) {
 
     components = new ComponentBuilder().setScreen({
         title: 'Mastering Nodejs Streams'
     }).setLayoutComponent().setFormComponent({
         onStart: () => {
-            addMessageOnTop('Hello World' + Date.now());
+            if (active) return
+            abortController = getController()
+            abortController.signal.onabort = () => {
+                addMessageOnTop(`{bold}canceled{/}`)
+            }
+            initializeFn(abortController.signal)
         },
         onEnd: () => {
-
+            active = false
+            abortController.abort()
         }
     }).setDataTableComponent().build();
 
