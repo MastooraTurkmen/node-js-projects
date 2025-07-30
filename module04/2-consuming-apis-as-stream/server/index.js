@@ -27,7 +27,7 @@ createServer(async (req, res) => {
         abortController.abort()
     })
     try {
-
+        res.writeHead(200, headers)
         await Readable.toWeb(createReadStream('./animeflv.csv')).pipeThrough(
             Transform.toWeb(csvtojson())
         ).pipeThrough(new TextDecoder()).pipeThrough(new TransformStream({
