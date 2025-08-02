@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "rm -f ./database/output-gmail.ndjson && node --watch src/index.js && sh check-results.sh",
     "seed": "node --watch src/seed.js"
   },
   "keywords": [],
@@ -11,6 +12,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@faker-js/faker": "^9.9.0"
+    "@faker-js/faker": "^9.9.0",
+    "split": "^1.0.1"
   }
 }
