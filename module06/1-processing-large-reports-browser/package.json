@@ -1,0 +1,17 @@
+{
+  "name": "1-processing-large-reports-browser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx browser-sync -w .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "browser-sync": "^3.0.4"
+  }
+}
