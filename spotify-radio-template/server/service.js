@@ -4,6 +4,7 @@ import path from 'node:path'
 import config from './config.js'
 import { randomUUID } from 'node:crypto'
 import { PassThrough } from 'node:stream'
+import { setInterval } from 'node:timers/promises'
 
 const {
     dir: {
@@ -40,13 +41,19 @@ class Service {
         }
     }
 
-    getClientFileName(file) {
+    getClientStream(file) {
         const id = randomUUID()
         const clientStream = new PassThrough()
         this.#clientStreams.set(id, clientStream)
 
         // just to unlock streams during tests and keep the connection alive
         clientStream.write(Buffer.alloc(1))
+
+        setInterval(() => {
+            clientStream.write(Buffer.alloc(1))
+        }, 100).unref()
+
+
         return { id, clientStream }
     }
 }
