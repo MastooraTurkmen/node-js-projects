@@ -1,4 +1,5 @@
 import Server from '../../../server/server.js'
+import { setInterval, setTimeout } from 'node:timers/promises'
 
 async function getTestServer() {
     const server = Server().listen(0)
@@ -29,6 +30,29 @@ async function getTestServer() {
 }
 
 
+async function pipeAndReadStreamData(url, onChunk, timeout = 10) {
+    const response = await fetch(`${url}/stream`)
+    const reader = response.body.getReader()
+    const startedAt = Date.now()
+    for await (const now of setInterval(1)) {
+        const { done, value } = await Promise.race([
+            reader.read(),
+            setTimeout(timeout).then(() => ({ done: true }))
+        ])
+        if (done || Date.now() - startedAt > timeout) {
+            reader.cancel()
+            break
+        }
+
+        // ignore <Buffer 00>
+        if (Buffer.compare(Buffer.from(value), Buffer.alloc(1)) === 0) {
+            continue
+        }
+        onChunk(value)
+    }
+}
+
 export {
     getTestServer,
+    pipeAndReadStreamData
 }
