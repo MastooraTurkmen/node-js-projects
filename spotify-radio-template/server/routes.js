@@ -6,6 +6,7 @@ import {
   pipelineThatCanConsumePartialData
 } from './util.js'
 import config from './config.js'
+import { once } from 'node:events'
 const {
   constants: {
     CONTENT_TYPES,
@@ -49,6 +50,13 @@ async function routes(request, response) {
       stream
     } = await controller.getFileStream(controllerHTML)
     return pipelineThatCanConsumePartialData(stream, response)
+  }
+
+  if (method === "POST" && path == "/controller") {
+    const data = await once(request, 'data')
+    const item = JSON.parse(data)
+    const result = await controller.handleCommand(item)
+    return response.end(JSON.stringify(result))
   }
 
 
