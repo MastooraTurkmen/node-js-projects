@@ -5,15 +5,22 @@ import config from './config.js'
 import { randomUUID } from 'node:crypto'
 import { PassThrough } from 'node:stream'
 import { setInterval } from 'node:timers/promises'
+import { logger } from "./util.js"
+import { spawn } from 'node:child_process'
 
 const {
     dir: {
         publicDirectory
     },
+    constants: {
+        englishConversation
+    }
 } = config
 
 class Service {
     #clientStreams = new Map()
+    #currentSong = englishConversation
+    #currentBitRate = 0
 
     #createFileStream(file) {
         return fs.createReadStream(file)
@@ -55,6 +62,22 @@ class Service {
 
 
         return { id, clientStream }
+    }
+
+    #executeSoxCommand(args) {
+        const cp = spawn('sox', args)
+    }
+
+    async #getBitRate(song) {
+        const args = [
+            '--i',
+            '-B',
+            song
+        ]
+    }
+
+    startStreaming() {
+        logger.info(`starting streaming ${this.#currentSong}`)
     }
 }
 
