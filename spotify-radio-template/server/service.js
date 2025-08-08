@@ -7,6 +7,7 @@ import { PassThrough } from 'node:stream'
 import { setInterval } from 'node:timers/promises'
 import { logger } from "./util.js"
 import { spawn } from 'node:child_process'
+import { once } from 'node:events'
 
 const {
     dir: {
@@ -21,6 +22,7 @@ class Service {
     #clientStreams = new Map()
     #currentSong = englishConversation
     #currentBitRate = 0
+    #activeHandlers = new Map()
 
     #createFileStream(file) {
         return fs.createReadStream(file)
@@ -66,6 +68,8 @@ class Service {
 
     #executeSoxCommand(args) {
         const cp = spawn('sox', args)
+        this.#activeHandlers.set(cp.pid, cp)
+        return cp
     }
 
     async #getBitRate(song) {
@@ -74,10 +78,15 @@ class Service {
             '-B',
             song
         ]
+        const { stdout } = this.#executeSoxCommand(args)
+        const bitrate = await once(stdout, 'data')
+        return bitrate.toString().trim()
     }
 
-    startStreaming() {
+    async startStreaming() {
         logger.info(`starting streaming ${this.#currentSong}`)
+        const bitRate = await this.#getBitRate(this.#currentSong)
+        console.log(`bitrate: ${bitRate}`)
     }
 }
 
