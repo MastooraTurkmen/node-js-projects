@@ -17,12 +17,13 @@ class Controller {
 
     const onClose = () => {
       logger.info(`closing connection to ${id}...`)
+      this.#service.removeClientStream(id)
     }
 
     return { stream: clientStream, onClose }
   }
 
-  handleCommand({ command }) {
+  async handleCommand({ command }) {
     const result = {
       result: 'ok',
     }
@@ -30,15 +31,22 @@ class Controller {
     logger.info(`cmd received: ${cmd}`)
     if (cmd.includes('start') && this.#isPlaying) {
       this.#isPlaying = true
+      // I won't use await because this won't return until the stream is closed
+      this.#service.startStreaming()
 
       return result
     }
 
     if (cmd.includes('stop')) {
       this.#isPlaying = false
+      this.#service.stopStreaming()
 
       return result
     }
+
+    const fx = await this.#service.readFxByName(cmd)
+    this.#service.appendFxStream(fx)
+    return result
   }
 
 }
