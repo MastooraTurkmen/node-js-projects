@@ -28,3 +28,12 @@
 #### Module 5
 
 1 - Child Process
+
+#### Module 6
+
+1 - Processing Large Reports Browser (part 1)
+2 - Processing Large Reports Browser (part 2)
+
+#### Spotify Radio Template
+
+Build a spotify radio website
