@@ -11,18 +11,18 @@
 3 - Duplex Streams
 4 - Project chat
 5 - Pip vs Pipeline
-6 - Project csvtondjson
+6 - Project csv to ndjson
 
 #### Module 3
 
 1 - Async Iterator
 2 - Streams Operators sql lite
-3 - abrot controller
+3 - abort controller
 4 - final project consuming string
 
 #### Module 4
 
-1 - Webstreams
+1 - Web streams
 2 - consuming apis as stream
 
 #### Module 5
