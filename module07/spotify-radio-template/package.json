@@ -1,0 +1,27 @@
+{
+  "name": "spotify-clone-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "live-reload": "node --watch server/index.js",
+    "test": "LOG_DISABLED=true node --test test/",
+    "test:watch": "LOG_DISABLED=true node --watch --test test/",
+    "live-reload:docker": "docker compose up",
+    "test:docker": "docker compose up test",
+    "test:watch:docker": "docker compose up test-watch"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "engines": {
+    "node": "v18.16.1"
+  },
+  "dependencies": {
+    "pino": "^8.11.0",
+    "pino-pretty": "^10.0.0",
+    "throttle": "^1.0.3"
+  },
+  "author": "mast"
+}

@@ -1,0 +1,30 @@
+-- prepare
+sox \
+  -v 0.99 \
+  -t mp3 \
+  "audio/fx/Boo! Sound Effect (128 kbps).mp3" \
+  -r 48000 \
+  -t mp3 \
+  "audio/output.mp3"
+
+Sample Rate: 48000
+48 kHz is 48,000 samples per second. 
+
+-- get info 
+ sox \
+    --i \
+    -B \
+    "audio/songs/conversation.mp3"
+
+the number of bits per second that can be transmitted along a digital network.
+
+-- Merge two songs
+sox \
+  -t mp3 \
+  -v 0.99 \
+  -m "audio/songs/conversation.mp3" \
+  -t mp3 \
+  -v 0.99 \
+  "audio/fx/Fart - Gaming Sound Effect (HD) (128 kbps).mp3" \
+  -t mp3 \
+  audio/output.mp3
