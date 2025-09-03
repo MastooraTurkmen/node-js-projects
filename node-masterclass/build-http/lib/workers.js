@@ -7,6 +7,8 @@ const http = require('http')
 const helpers = require('./helpers')
 const url = require('url')
 const _logs = require('./logs')
+const util = require('util')
+const debug = util.debuglog('workers')
 
 // workers object - module scaffolding
 const workers = {}
@@ -231,6 +233,11 @@ workers.logRotationLoop = () => {
 
 // init script
 workers.init = () => {
+
+    // send to console in yellow
+    console.log('\x1b[33m%s\x1b[0m', 'Background workers are running')
+
+
     // execute all the checks immediately
     workers.gatherAllChecks()
 
