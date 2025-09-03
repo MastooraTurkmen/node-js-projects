@@ -2,11 +2,13 @@ const http = require('http');
 const https = require('https');
 const { StringDecoder } = require('string_decoder');
 const url = require('url')
-const config = require('./lib/config')
+const config = require('./config')
 const fs = require('fs')
-const handlers = require('./lib/handlers');
-const helpers = require('./lib/helpers');
+const handlers = require('./handlers');
+const helpers = require('./helpers');
 const path = require('path');
+const util = require('util')
+const debug = util.debuglog('server')
 
 // Instantiate of http server module object
 let server = {}
@@ -81,6 +83,13 @@ server.unifiedServer = (req, res) => {
             res.writeHead(statusCode)
             res.end(payloadString)
             console.log('Returning this response:', statusCode, payloadString)
+
+            // if the response is 200, print green, otherwise print red
+            if (statusCode == 200) {
+                debug('\x1b[32m%s\x1b[0m', `${method.toUpperCase()} /${trimmedPath} ${statusCode}`)
+            } else {
+                debug('\x1b[31m%s\x1b[0m', `${method.toUpperCase()} /${trimmedPath} ${statusCode}`)
+            }
         })
     })
 }
@@ -99,12 +108,12 @@ server.router = {
 server.init = () => {
     // start the http server
     server.httpServer.listen(config.httpPort, () => {
-        console.log(`server is listening on ${config.httpPort}`)
+        console.log('\x1b[36m%s\x1b[0m', `server is listening on ${config.httpPort}`)
     })
 
     // start the https server
     httpsServer.listen(config.httpsPort, () => {
-        console.log(`server is listening on ${config.httpsPort}`)
+        console.log('\x1b[35m%s\x1b[0m', `server is listening on ${config.httpsPort}`)
     })
 }
 
