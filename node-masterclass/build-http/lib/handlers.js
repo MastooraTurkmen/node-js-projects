@@ -4,6 +4,23 @@ const helpers = require('./helpers')
 // define a request handler
 let handlers = {}
 
+// html handler
+handlers.index = (data, callback) => {
+    if (data.method == 'get') {
+        // read in a template as a string
+
+        helpers.getTemplate('index', (err, str) => {
+            if (!err && str) {
+                callback(200, str, 'html')
+            } else {
+                callback(500, undefined, 'html')
+            }
+        })
+    } else {
+        callback(405, undefined, 'html')
+    }
+}
+
 // Users handler
 handlers.users = (data, callback) => {
     const acceptableMethods = ['post', 'get', 'put', 'delete'];
