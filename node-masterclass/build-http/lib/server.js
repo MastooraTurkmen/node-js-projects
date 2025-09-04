@@ -72,14 +72,24 @@ server.unifiedServer = (req, res) => {
             "payload": helpers.parseJsonToObject(buffer)
         }
 
-        chosenHandler(data, (statusCode, payload) => {
+        chosenHandler(data, (statusCode, payload, contentType) => {
+            // determine the type of response (fallback to JSON)
+            contentType = typeof (contentType) == 'string' ? contentType : 'json';
+
             statusCode = typeof (statusCode) == 'number' ? statusCode : 200;
-            payload = typeof (payload) == 'object' ? payload : {};
 
-            const payloadString = JSON.stringify(payload)
+            const payloadString = ''
+            if (contentType == 'json') {
+                res.setHeader('Content-Type', 'application/json')
+                payload = typeof (payload) == 'object' ? payload : {};
+                payloadString = JSON.stringify(payload)
+            }
 
-            // return the response
-            res.setHeader('Content-Type', 'application/json')
+            if (contentType == 'html') {
+                res.setHeader('Content-Type', 'text/html')
+                payloadString = typeof (payload) == 'string' ? payload : '';
+            }
+
             res.writeHead(statusCode)
             res.end(payloadString)
             console.log('Returning this response:', statusCode, payloadString)
@@ -97,10 +107,19 @@ server.unifiedServer = (req, res) => {
 // define a request router
 
 server.router = {
+    '': handlers.index,
+    'account/create': handlers.accountCreate,
+    'account/edit': handlers.accountEdit,
+    'account/deleted': handlers.accountDeleted,
+    'session/create': handlers.sessionCreate,
+    'session/deleted': handlers.sessionDeleted,
+    'checks/all': handlers.checksList,
+    'checks/create': handlers.checksCreate,
+    'checks/edit': handlers.checksEdit,
     'ping': handlers.ping,
-    'users': handlers.users,
-    'tokens': handlers.tokens,
-    'checks': handlers.checks
+    'api/users': handlers.users,
+    'api/tokens': handlers.tokens,
+    'api/checks': handlers.checks
 }
 
 
