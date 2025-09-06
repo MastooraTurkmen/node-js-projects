@@ -10,6 +10,12 @@ environment.staging = {
         'accountSid': '',
         'authToken': '',
         'fromPhone': ''
+    },
+    'templateGlobals': {
+        'appName': 'UptimeChecker',
+        'companyName': 'NotARealCompany, Inc.',
+        'yearCreated': '2024',
+        'baseUrl': 'http://localhost:3000/'
     }
 }
 
@@ -19,6 +25,12 @@ environment.production = {
     'envName': 'production',
     'hashingSecret': 'thisIsASecret',
     'maxChecks': 5,
+    'templateGlobals': {
+        'appName': 'UptimeChecker',
+        'companyName': 'NotARealCompany, Inc.',
+        'yearCreated': '2024',
+        'baseUrl': 'http://localhost:5000/'
+    }
 }
 
 // determine which environment was passed as a command-line argument
