@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="en-us">
+    <meta href="{global.baseUrl}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{head.title} | {global.appName}</title>
+    <meta name="description" content="{head.description}">
+
+    <!-- Static Assets -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script type="text/javascript" charset="utf-8" src="public/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="public/app.css">
+</head>
+
+<body class="{body.class}">
+    <div class="wrapper">
+        <div class="header">
+            <a href="/" class="logo"></a>
+            <ul class="menu">
+                <li>
+                    <a href="/home">Home</a>
+                </li>
+                <li>
+                    <a class="loggedOut" href="/account/create">Sign up</a>
+                </li>
+                <li>
+                    <a class="loggedOut" href="/session/create">Login</a>
+                </li>
+                <li>
+                    <a class="loggedIn" href="/checks/all">Dashboard</a>
+                </li>
+                <li>
+                    <a class="loggedIn" href="/account/edit">Account Settings</a>
+                </li>
+                <li>
+                    <a class="loggedIn" href="#">Logout</a>
+                </li>
+            </ul>
+            <div class="content">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
