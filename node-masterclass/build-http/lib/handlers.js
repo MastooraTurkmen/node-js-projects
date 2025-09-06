@@ -7,17 +7,53 @@ let handlers = {}
 // html handler
 handlers.index = (data, callback) => {
     if (data.method == 'get') {
+
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Uptime Monitoring - Made Simple',
+            'head.description': 'We offer free, simple uptime monitoring for HTTP/HTTPS sites of all kinds. When your site goes down, we\'ll send you a text to let you know',
+            'body.title': 'Hello templated world!',
+            'body.class': 'index'
+        }
+
         // read in a template as a string
 
-        helpers.getTemplate('index', (err, str) => {
+        helpers.getTemplate('index', templateData, (err, str) => {
             if (!err && str) {
-                callback(200, str, 'html')
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
             } else {
                 callback(500, undefined, 'html')
             }
         })
     } else {
         callback(405, undefined, 'html')
+    }
+}
+
+
+// favicon
+
+handlers.favicon = (data, callback) => {
+    if (data.method == 'get') {
+        // read in the favicon's data
+        helpers.getStaticAsset('favicon.ico', (err, data) => {
+            if (!err && data) {
+                // callback the data
+                callback(200, data, 'favicon')
+            } else {
+                callback(500)
+            }
+        })
+    } else {
+        callback(405)
     }
 }
 
