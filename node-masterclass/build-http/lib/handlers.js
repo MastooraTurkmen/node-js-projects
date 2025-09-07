@@ -12,7 +12,6 @@ handlers.index = (data, callback) => {
         const templateData = {
             'head.title': 'Uptime Monitoring - Made Simple',
             'head.description': 'We offer free, simple uptime monitoring for HTTP/HTTPS sites of all kinds. When your site goes down, we\'ll send you a text to let you know',
-            'body.title': 'Hello templated world!',
             'body.class': 'index'
         }
 
@@ -39,6 +38,39 @@ handlers.index = (data, callback) => {
 }
 
 
+// Create Account
+handlers.accountCreate = (data, callback) => {
+    if (data.method == 'get') {
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Create an Account',
+            'head.description': 'Signup is easy and only takes a few seconds',
+            'body.class': 'accountCreate'
+        }
+
+        // read in a template as a string
+        helpers.getTemplate('accountCreate', templateData, (err, str) => {
+            if (!err && str) {
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
+            } else {
+                callback(500, undefined, 'html')
+            }
+
+        })
+    } else {
+        callback(405, undefined, 'html')
+    }
+}
+
+
 // favicon
 
 handlers.favicon = (data, callback) => {
@@ -52,6 +84,44 @@ handlers.favicon = (data, callback) => {
                 callback(500)
             }
         })
+    } else {
+        callback(405)
+    }
+}
+
+
+// public assets
+handlers.public = (data, callback) => {
+    if (data.method == 'get') {
+        // get the filename being requested
+        const trimmedAssetName = data.trimmedPath.replace('public/', '').trim()
+        if (trimmedAssetName.length > 0) {
+            // read in the asset's data
+            helpers.getStaticAsset(trimmedAssetName, (err, data) => {
+                if (!err && data) {
+                    // determine the content type (default to plain text)
+                    let contentType = 'plain'
+                    if (trimmedAssetName.indexOf('.css') > -1) {
+                        contentType = 'css'
+                    }
+                    if (trimmedAssetName.indexOf('.png') > -1) {
+                        contentType = 'png'
+                    }
+                    if (trimmedAssetName.indexOf('.jpg') > -1) {
+                        contentType = 'jpg'
+                    }
+                    if (trimmedAssetName.indexOf('.ico') > -1) {
+                        contentType = 'favicon'
+                    }
+                    // callback the data
+                    callback(200, data, contentType)
+                } else {
+                    callback(404)
+                }
+            })
+        } else {
+            callback(404)
+        }
     } else {
         callback(405)
     }
