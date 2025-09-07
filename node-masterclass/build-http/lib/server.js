@@ -61,7 +61,10 @@ server.unifiedServer = (req, res) => {
     req.on('end', () => {
         buffer += decoder.end()
 
-        const chosenHandler = typeof (server.router[trimmedPath]) !== 'undefined' ? server.router[trimmedPath] : handlers.notFound
+        let chosenHandler = typeof (server.router[trimmedPath]) !== 'undefined' ? server.router[trimmedPath] : handlers.notFound
+
+        // if the request is within the public directory, use to the public handler instead
+        chosenHandler = trimmedPath.indexOf('public/') > -1 ? handlers.public : chosenHandler
 
         // construct the data object to send to the handler
         const data = {
@@ -88,6 +91,31 @@ server.unifiedServer = (req, res) => {
             if (contentType == 'html') {
                 res.setHeader('Content-Type', 'text/html')
                 payloadString = typeof (payload) == 'string' ? payload : '';
+            }
+
+            if (contentType == 'favicon') {
+                res.setHeader('Content-Type', 'image/x-icon')
+                payloadString = typeof (payload) !== 'undefined' ? payload : '';
+            }
+
+            if (contentType == 'css') {
+                res.setHeader('Content-Type', 'text/css')
+                payloadString = typeof (payload) !== 'undefined' ? payload : '';
+            }
+
+            if (contentType == 'png') {
+                res.setHeader('Content-Type', 'image/png')
+                payloadString = typeof (payload) !== 'undefined' ? payload : '';
+            }
+
+            if (contentType == 'jpg') {
+                res.setHeader('Content-Type', 'image/jpg')
+                payloadString = typeof (payload) !== 'undefined' ? payload : '';
+            }
+
+            if (contentType == 'plain') {
+                res.setHeader('Content-Type', 'text/plain')
+                payloadString = typeof (payload) !== 'undefined' ? payload : '';
             }
 
             res.writeHead(statusCode)
