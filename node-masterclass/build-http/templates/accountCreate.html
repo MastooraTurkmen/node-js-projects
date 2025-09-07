@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Create</title>
+</head>
+
+<body>
+    <h1>Create Your Account</h1>
+    <form action="/api/users" method="POST">
+        <div class="formError"></div>
+        <div class="inputWrapper">
+            <div class="inputLable">First Name:</div>
+            <input type="text" id="firstName" name="firstName" required>
+        </div>
+        <div class="inputWrapper">
+            <div class="inputLable">Last Name:</div>
+            <input type="text" id="lastName" name="lastName" required>
+        </div>
+
+        <div class="inputWrapper">
+            <div class="inputLable">Phone Number:</div>
+            <input type="text" id="phone" name="phone" required>
+        </div>
+
+        <div class="inputWrapper">
+            <div class="inputLable">Password:</div>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="inputWrapper">
+            <div class="inputLable">TOS Agreement:</div>
+            <input type="checkbox" id="tosAgreement" name="tosAgreement" required>
+        </div>
+        <div class="inputWrapper ctaWrapper">
+            <button type="submit" class="cta blue">Get Started</button>
+        </div>
+    </form>
+</body>
+
+</html>
