@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Create Account</title>
+</head>
+
+<body>
+    <h1>
+        Create an Account
+    </h1>
+    <h2>
+        Enter your phone number and password to access your account
+    </h2>
+    <div class="formWrapper">
+        <form action="/api/tokens" method="POST" id="sessionCreate">
+            <div class="formError"></div>
+
+            <div class="inputWrapper">
+                <div class="inputLable">Phone Number:</div>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+
+            <div class="inputWrapper">
+                <div class="inputLable">Password:</div>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="inputWrapper ctaWrapper">
+                <button type="submit" class="cta blue">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
