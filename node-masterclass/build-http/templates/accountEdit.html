@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Edit</title>
+</head>
+
+<body>
+    <h1>
+        Edit Your Account
+    </h1>
+    <h2>
+        You can edit your account here. Change your password or delete your account.
+    </h2>
+    <div class="formWrapper">
+        <form action="/api/users" method="POST" id="accountEdit">
+            <div class="formError"></div>
+            <div class="inputWrapper">
+                <div class="inputLable">First Name:</div>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="inputWrapper">
+                <div class="inputLable">Last Name:</div>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="inputWrapper">
+                <div class="inputLable">Phone Number:</div>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+            <div class="inputWrapper">
+                <div class="inputLable">Password:</div>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="inputWrapper ctaWrapper">
+                <button type="submit" class="cta blue">Update</button>
+            </div>
+        </form>
+    </div>
+    <div class="ctaWrapper">
+        <a class="cta red" id="deleteAccount">Delete Account</a>
+    </div>
+</body>
+
+</html>
