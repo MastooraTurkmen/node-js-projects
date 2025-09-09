@@ -200,6 +200,84 @@ app.loadAccountEditPage = () => {
     }
 }
 
+// Load the dashboard page specifically
+app.loadDashboardPage = () => {
+    const phone = typeof (app.config.sessionToken.phone) == 'string' ? app.config.sessionToken.phone : false
+    if (phone) {
+        // Fetch the user data
+        const queryStringObject = {
+            'phone': phone
+        }
+        app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
+            if (statusCode == 200) {
+                const checkData = responsePayload;
+
+                const table = document.getElementById('checksListTable');
+                checkData.forEach(function (check) {
+                    const tr = table.insertRow(-1);
+                    const td0 = tr.insertCell(0);
+                    const td1 = tr.insertCell(1);
+                    const td2 = tr.insertCell(2);
+                    const td3 = tr.insertCell(3);
+                    const td4 = tr.insertCell(4);
+                    const td5 = tr.insertCell(5);
+                    td0.innerHTML = check.id;
+                    td1.innerHTML = check.protocol;
+                    td2.innerHTML = check.url;
+                    td3.innerHTML = check.method.toUpperCase();
+                    td4.innerHTML = '0' + check.successCodes.toString();
+                    td5.innerHTML = check.timeoutSeconds + ' seconds';
+                });
+            } else {
+                // If the request comes back as something other than 200, log the user out (on the assumption that the api is down or the token is invalid)
+                app.logUserOut()
+            }
+        })
+    } else {
+        app.logUserOut()
+    }
+
+
+}
+
+// Load the checks edit page specifically
+app.loadChecksEditPage = () => {
+    // Get the check id from the query string, if none is found then log the user out
+    const id = typeof (app.config.sessionToken.id) == 'string' ? app.config.sessionToken.id : false
+    if (id) {
+        // Fetch the check data
+        const queryStringObject = {
+            'id': id
+        }
+        app.client.request(undefined, 'api/checks', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
+            if (statusCode == 200) {
+                // Put the data into the forms as values where needed
+                document.querySelector('#checksEdit1 .idInput').value = responsePayload.id
+                document.querySelector('#checksEdit1 .protocolInput').value = responsePayload.protocol
+                document.querySelector('#checksEdit1 .urlInput').value = responsePayload.url
+                document.querySelector('#checksEdit1 .methodInput').value = responsePayload.method
+                const successCodesCheckboxes = document.querySelectorAll('#checksEdit1 .successCodesInput')
+                for (let i = 0; i < successCodesCheckboxes.length; i++) {
+                    if (responsePayload.successCodes.indexOf(parseInt(successCodesCheckboxes[i].value)) > -1) {
+                        successCodesCheckboxes[i].checked = true
+                    }
+                }
+                document.querySelector('#checksEdit1 .timeoutSecondsInput').value = responsePayload.timeoutSeconds
+
+                // Put the hidden id field into both forms
+                const hiddenIdInputs = document.querySelectorAll('input.hiddenIdInput')
+                for (let i = 0; i < hiddenIdInputs.length; i++) {
+                    hiddenIdInputs[i].value = responsePayload.id
+                }
+            } else {
+                // If the request comes back as something other than 200, log the user out (on the assumption that the api is down or the token is invalid)
+                app.logUserOut()
+            }
+        })
+    } else {
+        app.logUserOut()
+    }
+}
 
 // Init (bootstrapping)
 app.init = () => {
