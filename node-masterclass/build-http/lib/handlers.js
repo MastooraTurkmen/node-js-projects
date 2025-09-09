@@ -165,6 +165,126 @@ handlers.accountEdit = (data, callback) => {
     }
 }
 
+// Delete your account
+handlers.accountDeleted = (data, callback) => {
+    if (data.method == 'get') {
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Account Deleted',
+            'head.description': 'Your account has been deleted.',
+            'body.class': 'accountDeleted'
+        }
+
+        // read in a template as a string
+        helpers.getTemplate('accountDeleted', templateData, (err, str) => {
+            if (!err && str) {
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
+            } else {
+                callback(500, undefined, 'html')
+            }
+        })
+    }
+}
+
+
+// create a new check
+handlers.checksCreate = (data, callback) => {
+    // reject any request that isn't a GET
+    if (data.method == 'get') {
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Create a New Check',
+            'body.class': 'checksCreate'
+        }
+        // read in a template as a string
+        helpers.getTemplate('checksCreate', templateData, (err, str) => {
+            if (!err && str) {
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
+            } else {
+                callback(500, undefined, 'html')
+            }
+        })
+    } else {
+        callback(405, undefined, 'html')
+    }
+}
+
+
+// Dashboard (view all checks)
+handlers.checksList = (data, callback) => {
+    if (data.method == 'get') {
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Dashboard',
+            'body.class': 'checksList'
+        }
+        // read in a template as a string
+        helpers.getTemplate('checksList', templateData, (err, str) => {
+            if (!err && str) {
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
+            } else {
+                callback(500, undefined, 'html')
+            }
+        })
+    } else {
+        callback(405, undefined, 'html')
+    }
+}
+
+// check Edit
+handlers.checksEdit = (data, callback) => {
+    if (data.method == 'get') {
+        // prepare data for interpolation
+        const templateData = {
+            'head.title': 'Check Details',
+            'body.class': 'checksEdit'
+        }
+        // read in a template as a string
+        helpers.getTemplate('checksEdit', templateData, (err, str) => {
+            if (!err && str) {
+                // add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, (err, str) => {
+                    if (!err && str) {
+                        // return that page as html
+                        callback(200, str, 'html')
+                    } else {
+                        callback(500, undefined, 'html')
+                    }
+                })
+            } else {
+                callback(500, undefined, 'html')
+            }
+        })
+    } else {
+        callback(405, undefined, 'html')
+    }
+}
+
+
 
 // favicon
 
