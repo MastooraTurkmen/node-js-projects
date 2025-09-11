@@ -12,6 +12,95 @@ const e = new _events()
 // Instantiate the CLI module object
 const cli = {}
 
+// Input handlers
+e.on('man', str => {
+    cli.responders.help()
+})
+
+e.on('help', str => {
+    cli.responders.help()
+})
+
+e.on('exit', str => {
+    cli.responders.exit()
+})
+
+e.on('stats', str => {
+    cli.responders.stats()
+})
+
+e.on('list users', str => {
+    cli.responders.listUsers()
+})
+
+e.on('more user info', str => {
+    cli.responders.moreUserInfo(str)
+})
+
+e.on('list checks', str => {
+    cli.responders.listChecks()
+})
+
+e.on('more check info', str => {
+    cli.responders.moreCheckInfo()
+})
+
+e.on('list logs', str => {
+    cli.responders.listLogs()
+})
+
+e.on('more log info', str => {
+    cli.responders.moreLogInfo(str)
+})
+
+// Responders object
+cli.responders = {}
+
+// Help/ Man
+cli.responders.help = () => {
+    console.log('You asked for help')
+}
+
+// Exit
+cli.responders.exit = () => {
+    process.exit(0)
+}
+
+// Stats
+cli.responders.stats = () => {
+    console.log('You asked for stats')
+}
+
+// List Users
+cli.responders.listUsers = () => {
+    console.log('You asked to list users')
+}
+
+// More User Info
+cli.responders.moreUserInfo = (str) => {
+    console.log('You asked for more user info', str)
+}
+
+// List Checks
+cli.responders.listChecks = () => {
+    console.log('You asked to list checks')
+}
+
+// More Check Info
+cli.responders.moreCheckInfo = () => {
+    console.log('You asked for more check info')
+}
+
+// List Logs
+cli.responders.listLogs = () => {
+    console.log('You asked to list logs')
+}
+
+// More Log Info
+cli.responders.moreLogInfo = (str) => {
+    console.log('You asked for more log info', str)
+}
+
 // Input processors
 cli.processInput = (str) => {
     str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : false
