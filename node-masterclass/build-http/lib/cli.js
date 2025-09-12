@@ -8,6 +8,8 @@ const events = require('events')
 
 class _events extends events { }
 const e = new _events()
+const os = require('os')
+const v8 = require('v8')
 
 // Instantiate the CLI module object
 const cli = {}
@@ -58,7 +60,82 @@ cli.responders = {}
 
 // Help/ Man
 cli.responders.help = () => {
-    console.log('You asked for help')
+    const commands = {
+        'man': 'Show this help page',
+        'help': 'Alias of',
+        'exit': 'Kill the CLI (and the rest of the application)',
+        'stats': 'Get statistics on the underlying operating system and resource utilization',
+        'list users': 'Show a list of all registered users',
+        'more user info --{userId}': 'Show details of a specific user',
+        'list checks --up --down': 'Show a list of all active checks',
+        'more check info --{checkedId}': 'Show details of a specified check',
+        'list logs': 'Show a list of all log files available to be read (compressed only)',
+        'more log info': 'Show details of a specified log file'
+    }
+
+    // show a header for the help page that is as wide as the screen
+    cli.horizontalLine()
+    cli.centered('CLI MANUAL')
+    cli.horizontalLine()
+    cli.verticalSpace(2)
+
+
+    // show each command, followed by its explanation, in white and yellow respectively
+    for (let key in commands) {
+        if (commands.hasOwnProperty(key)) {
+            let value = commands[key]
+            let line = '\x1b[33m' + key + '\x1b[0m'
+            let padding = 60 - line.length
+            for (let i = 0; i < padding; i++) {
+                line += ' '
+            }
+            line += value
+            console.log(line)
+            cli.verticalSpace()
+        }
+    }
+
+    cli.verticalSpace(1)
+
+    // end with another horizontal line
+    cli.horizontalLine()
+}
+
+// Create a vertical space
+cli.verticalSpace = (lines) => {
+    lines = typeof (lines) == 'number' && lines > 0 ? lines : 1
+    for (let i = 0; i < lines; i++) {
+        console.log('')
+    }
+}
+
+// Create a horizontal line across the screen
+cli.horizontalLine = () => {
+    // get the available screen size
+    const width = process.stdout.columns
+
+    let line = ''
+    for (let i = 0; i < width; i++) {
+        line += '-'
+    }
+    console.log(line)
+}
+
+// Create centered text on the screen
+cli.centered = (str) => {
+    str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : ''
+
+    // get the available screen size
+    const width = process.stdout.columns
+
+    // calculate the left padding there should be
+    const leftPadding = Math.floor((width - str.length) / 2)
+    let line = ''
+    for (let i = 0; i < leftPadding; i++) {
+        line += ' '
+    }
+    line += str
+    console.log(line)
 }
 
 // Exit
@@ -68,7 +145,37 @@ cli.responders.exit = () => {
 
 // Stats
 cli.responders.stats = () => {
-    console.log('You asked for stats')
+    // Compile an object of stats
+    const stats = {
+        'Load Average': os.loadavg().join(' '),
+        'CPU Count': os.cpus().length,
+        'Free Memory': os.freemem(),
+        'Current Malloced Memory': v8.getHeapStatistics().malloced_memory,
+        'Peak Malloced Memory': v8.getHeapStatistics().peak_malloced_memory,
+        'Allocated Heap Used (%)': Math.round((v8.getHeapStatistics().used_heap_size / v8.getHeapStatistics().total_heap_size) * 100) + '%',
+        'Uptime': os.uptime() + ' Seconds'
+    }
+
+    // Create a header for the stats
+    cli.horizontalLine()
+    cli.centered('SYSTEM STATISTICS')
+    cli.horizontalLine()
+    cli.verticalSpace(2)
+
+    // log out each stat
+    for (let key in stats) {
+        if (stats.hasOwnProperty(key)) {
+            let value = stats[key]
+            let line = '\x1b[33m' + key + '\x1b[0m'
+            let padding = 60 - line.length
+            for (let i = 0; i < padding; i++) {
+                line += ' '
+            }
+            line += value
+            console.log(line)
+            cli.verticalSpace()
+        }
+    }
 }
 
 // List Users
