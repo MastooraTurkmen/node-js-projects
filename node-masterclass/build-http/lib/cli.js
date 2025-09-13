@@ -10,6 +10,8 @@ class _events extends events { }
 const e = new _events()
 const os = require('os')
 const v8 = require('v8')
+const _data = require('./data')
+const helpers = require('./helpers')
 
 // Instantiate the CLI module object
 const cli = {}
@@ -180,32 +182,146 @@ cli.responders.stats = () => {
 
 // List Users
 cli.responders.listUsers = () => {
-    console.log('You asked to list users')
+    _data.list('users', (err, userIds) => {
+        if (!err && userIds && userIds.length > 0) {
+            cli.responders.listUsers()
+
+            userIds.forEach(userIds => {
+                _data.read('users', userIds, (err, userIds) => {
+                    if (!err && userIds) {
+                        let line = `Name: ${userIds.firstName} ${userIds.lastName} Phone: ${userIds.phone} Checks: `
+                        const numberOfChecks = typeof (userIds.checks) == 'object' && userIds.checks instanceof Array && userIds.checks.length > 0 ? userIds.checks.length : 0
+                        line += numberOfChecks
+                        console.log(line)
+                        cli.verticalSpace()
+                    }
+                })
+            })
+        }
+    })
 }
 
 // More User Info
 cli.responders.moreUserInfo = (str) => {
-    console.log('You asked for more user info', str)
+    // get the userId from the string
+    const arr = str.split('--')
+    const userId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
+    if (userId) {
+        // lookup the user
+        _data.read('users', userId, (err, userData) => {
+            if (!err && userData) {
+                // remove the hashed password
+                delete userData.hashedPassword
+
+                // print the JSON with text highlighting
+                cli.verticalSpace()
+                console.dir(userData, { colors: true })
+                cli.verticalSpace()
+            } else {
+                console.log('Error: Could not find specified user')
+            }
+        })
+    } else {
+        console.log('Error: You must provide a userId')
+    }
 }
 
 // List Checks
-cli.responders.listChecks = () => {
-    console.log('You asked to list checks')
+cli.responders.listChecks = (str) => {
+    _data.list('checks', (err, checkIds) => {
+        if (!err && checkIds && checkIds.length > 0) {
+            cli.verticalSpace()
+            console.log(`Total Checks: ${checkIds.length}`)
+            cli.verticalSpace()
+
+            checkIds.forEach(checkId => {
+                _data.read('checks', checkId, (err, checkedId) => {
+                    const includeCheck = false
+                    const lowerString = str.toLowerCase()
+
+                    // Get the state, default to down
+                    const state = typeof (checkId.state) == 'string' ? checkId.state : 'down'
+
+                    // Get the state, default to unknown
+                    const stateOrUnknown = typeof (checkId.state) == 'string' ? checkId.state : 'unknown'
+
+                    // If the user has specified the state, or hasn't specified any state, include the check accordingly
+                    if (lowerString.indexOf('--' + state) > -1 || (lowerString.indexOf('--up') == -1 && lowerString.indexOf('--down') == -1)) {
+                        const line = `ID: ${checkId.id} Method: ${checkId.method.toUpperCase()} URL: ${checkId.protocol}://${checkId.url} State: ${stateOrUnknown} Last Checked: ${typeof (checkId.lastChecked) == 'number' && checkId.lastChecked > 0 ? new Date(checkId.lastChecked).toLocaleString() : 'Never'}`
+                        console.log(line)
+                        cli.verticalSpace()
+                    }
+                })
+            })
+        }
+    })
 }
 
 // More Check Info
 cli.responders.moreCheckInfo = () => {
-    console.log('You asked for more check info')
+    // get the checkId from the string
+    const arr = str.split('--')
+    const checkId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
+    if (checkId) {
+        // lookup the check
+        _data.read('checks', checkId, (err, checkData) => {
+            if (!err && checkData) {
+                // print the JSON with text highlighting
+                cli.verticalSpace()
+                console.dir(checkData, { colors: true })
+                cli.verticalSpace()
+            } else {
+                console.log('Error: Could not find specified check')
+            }
+        })
+    } else {
+        console.log('Error: You must provide a checkId')
+    }
 }
 
 // List Logs
 cli.responders.listLogs = () => {
-    console.log('You asked to list logs')
+    _data.list(true, (err, logFileNames) => {
+        if (!err && logFileNames && logFileNames.length > 0) {
+            cli.verticalSpace()
+            console.log(`Total Logs: ${logFileNames.length}`)
+            cli.verticalSpace()
+
+            logFileNames.forEach(logFileName => {
+                if (logFileName.indexOf('-') > -1) {
+                    console.log(logFileName)
+                    cli.verticalSpace()
+                }
+            })
+        }
+    })
 }
 
 // More Log Info
 cli.responders.moreLogInfo = (str) => {
-    console.log('You asked for more log info', str)
+    // get the logFileName from the string
+    const arr = str.split('--')
+    const logFileName = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
+    if (logFileName) {
+        // lookup the log file
+        _data.decompress(logFileName, (err, strData) => {
+            if (!err && strData) {
+                // split into lines
+                const arr = strData.split('\n')
+                arr.forEach(jsonString => {
+                    const logObject = helpers.parseJsonToObject(jsonString)
+                    if (logObject && JSON.stringify(logObject) !== '{}') {
+                        console.dir(logObject, { colors: true })
+                        cli.verticalSpace()
+                    }
+                })
+            } else {
+                console.log('Error: Could not find specified log file')
+            }
+        })
+    } else {
+        console.log('Error: You must provide a log file name')
+    }
 }
 
 // Input processors
