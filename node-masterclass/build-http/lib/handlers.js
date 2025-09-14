@@ -342,6 +342,12 @@ handlers.public = (data, callback) => {
     }
 }
 
+// Example error
+handlers.exampleError = (data, callback) => {
+    const err = new Error('This is an example error')
+    throw err
+}
+
 // Users handler
 handlers.users = (data, callback) => {
     const acceptableMethods = ['post', 'get', 'put', 'delete'];
