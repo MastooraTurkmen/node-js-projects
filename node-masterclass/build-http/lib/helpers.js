@@ -4,10 +4,14 @@ const crypto = require('crypto')
 const https = require('https')
 const config = require('./config')
 const queryString = require('querystring')
-cons
 
 // helpers object
 const helpers = {}
+
+// Sample for testing that simple returns a number
+helpers.getANumber = function () {
+    return 1;
+}
 
 // create a SHA256 hash
 helpers.hash = (str) => {
