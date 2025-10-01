@@ -1,336 +1,339 @@
-// CLI Related Tasks
+/*
+ * CLI-related tasks
+ *
+ */
 
 // Dependencies
-const readline = require('readline')
-const util = require('util')
-const debug = util.debuglog('cli')
-const events = require('events')
+var readline = require('readline');
+var util = require('util');
+var debug = util.debuglog('cli');
+var events = require('events');
+class _events extends events { };
+var e = new _events();
+var os = require('os');
+var v8 = require('v8');
+var _data = require('./data');
+var _logs = require('./logs');
+var helpers = require('./helpers');
+var childProcess = require('child_process');
 
-class _events extends events { }
-const e = new _events()
-const os = require('os')
-const v8 = require('v8')
-const _data = require('./data')
-const helpers = require('./helpers')
-
-// Instantiate the CLI module object
-const cli = {}
+// Instantiate the cli module object
+var cli = {};
 
 // Input handlers
-e.on('man', str => {
-    cli.responders.help()
-})
+e.on('man', function (str) {
+    cli.responders.help();
+});
 
-e.on('help', str => {
-    cli.responders.help()
-})
+e.on('help', function (str) {
+    cli.responders.help();
+});
 
-e.on('exit', str => {
-    cli.responders.exit()
-})
+e.on('exit', function (str) {
+    cli.responders.exit();
+});
 
-e.on('stats', str => {
-    cli.responders.stats()
-})
+e.on('stats', function (str) {
+    cli.responders.stats();
+});
 
-e.on('list users', str => {
-    cli.responders.listUsers()
-})
+e.on('list users', function (str) {
+    cli.responders.listUsers();
+});
 
-e.on('more user info', str => {
-    cli.responders.moreUserInfo(str)
-})
+e.on('more user info', function (str) {
+    cli.responders.moreUserInfo(str);
+});
 
-e.on('list checks', str => {
-    cli.responders.listChecks()
-})
+e.on('list checks', function (str) {
+    cli.responders.listChecks(str);
+});
 
-e.on('more check info', str => {
-    cli.responders.moreCheckInfo()
-})
+e.on('more check info', function (str) {
+    cli.responders.moreCheckInfo(str);
+});
 
-e.on('list logs', str => {
-    cli.responders.listLogs()
-})
+e.on('list logs', function (str) {
+    cli.responders.listLogs();
+});
 
-e.on('more log info', str => {
-    cli.responders.moreLogInfo(str)
-})
+e.on('more log info', function (str) {
+    cli.responders.moreLogInfo(str);
+});
+
 
 // Responders object
-cli.responders = {}
+cli.responders = {};
 
-// Help/ Man
-cli.responders.help = () => {
-    const commands = {
-        'man': 'Show this help page',
-        'help': 'Alias of',
+// Help / Man
+cli.responders.help = function () {
+
+    // Codify the commands and their explanations
+    var commands = {
         'exit': 'Kill the CLI (and the rest of the application)',
+        'man': 'Show this help page',
+        'help': 'Alias of the "man" command',
         'stats': 'Get statistics on the underlying operating system and resource utilization',
-        'list users': 'Show a list of all registered users',
-        'more user info --{userId}': 'Show details of a specific user',
-        'list checks --up --down': 'Show a list of all active checks',
-        'more check info --{checkedId}': 'Show details of a specified check',
-        'list logs': 'Show a list of all log files available to be read (compressed only)',
-        'more log info': 'Show details of a specified log file'
-    }
+        'List users': 'Show a list of all the registered (undeleted) users in the system',
+        'More user info --{userId}': 'Show details of a specified user',
+        'List checks --up --down': 'Show a list of all the active checks in the system, including their state. The "--up" and "--down flags are both optional."',
+        'More check info --{checkId}': 'Show details of a specified check',
+        'List logs': 'Show a list of all the log files available to be read (compressed and uncompressed)',
+        'More log info --{logFileName}': 'Show details of a specified log file',
+    };
 
-    // show a header for the help page that is as wide as the screen
-    cli.horizontalLine()
-    cli.centered('CLI MANUAL')
-    cli.horizontalLine()
-    cli.verticalSpace(2)
+    // Show a header for the help page that is as wide as the screen
+    cli.horizontalLine();
+    cli.centered('CLI MANUAL');
+    cli.horizontalLine();
+    cli.verticalSpace(2);
 
-
-    // show each command, followed by its explanation, in white and yellow respectively
-    for (let key in commands) {
+    // Show each command, followed by its explanation, in white and yellow respectively
+    for (var key in commands) {
         if (commands.hasOwnProperty(key)) {
-            let value = commands[key]
-            let line = '\x1b[33m' + key + '\x1b[0m'
-            let padding = 60 - line.length
-            for (let i = 0; i < padding; i++) {
-                line += ' '
+            var value = commands[key];
+            var line = '      \x1b[33m ' + key + '      \x1b[0m';
+            var padding = 60 - line.length;
+            for (i = 0; i < padding; i++) {
+                line += ' ';
             }
-            line += value
-            console.log(line)
-            cli.verticalSpace()
+            line += value;
+            console.log(line);
+            cli.verticalSpace();
         }
     }
+    cli.verticalSpace(1);
 
-    cli.verticalSpace(1)
+    // End with another horizontal line
+    cli.horizontalLine();
 
-    // end with another horizontal line
-    cli.horizontalLine()
-}
+};
 
 // Create a vertical space
-cli.verticalSpace = (lines) => {
-    lines = typeof (lines) == 'number' && lines > 0 ? lines : 1
-    for (let i = 0; i < lines; i++) {
-        console.log('')
+cli.verticalSpace = function (lines) {
+    lines = typeof (lines) == 'number' && lines > 0 ? lines : 1;
+    for (i = 0; i < lines; i++) {
+        console.log('');
     }
-}
+};
 
 // Create a horizontal line across the screen
-cli.horizontalLine = () => {
-    // get the available screen size
-    const width = process.stdout.columns
+cli.horizontalLine = function () {
 
-    let line = ''
-    for (let i = 0; i < width; i++) {
-        line += '-'
+    // Get the available screen size
+    var width = process.stdout.columns;
+
+    // Put in enough dashes to go across the screen
+    var line = '';
+    for (i = 0; i < width; i++) {
+        line += '-';
     }
-    console.log(line)
-}
+    console.log(line);
+
+
+};
 
 // Create centered text on the screen
-cli.centered = (str) => {
-    str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : ''
+cli.centered = function (str) {
+    str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : '';
 
-    // get the available screen size
-    const width = process.stdout.columns
+    // Get the available screen size
+    var width = process.stdout.columns;
 
-    // calculate the left padding there should be
-    const leftPadding = Math.floor((width - str.length) / 2)
-    let line = ''
-    for (let i = 0; i < leftPadding; i++) {
-        line += ' '
+    // Calculate the left padding there should be
+    var leftPadding = Math.floor((width - str.length) / 2);
+
+    // Put in left padded spaces before the string itself
+    var line = '';
+    for (i = 0; i < leftPadding; i++) {
+        line += ' ';
     }
-    line += str
-    console.log(line)
-}
+    line += str;
+    console.log(line);
+};
 
 // Exit
-cli.responders.exit = () => {
-    process.exit(0)
-}
+cli.responders.exit = function () {
+    process.exit(0);
+};
 
 // Stats
-cli.responders.stats = () => {
+cli.responders.stats = function () {
     // Compile an object of stats
-    const stats = {
+    var stats = {
         'Load Average': os.loadavg().join(' '),
         'CPU Count': os.cpus().length,
         'Free Memory': os.freemem(),
         'Current Malloced Memory': v8.getHeapStatistics().malloced_memory,
         'Peak Malloced Memory': v8.getHeapStatistics().peak_malloced_memory,
-        'Allocated Heap Used (%)': Math.round((v8.getHeapStatistics().used_heap_size / v8.getHeapStatistics().total_heap_size) * 100) + '%',
+        'Allocated Heap Used (%)': Math.round((v8.getHeapStatistics().used_heap_size / v8.getHeapStatistics().total_heap_size) * 100),
+        'Available Heap Allocated (%)': Math.round((v8.getHeapStatistics().total_heap_size / v8.getHeapStatistics().heap_size_limit) * 100),
         'Uptime': os.uptime() + ' Seconds'
-    }
+    };
 
     // Create a header for the stats
-    cli.horizontalLine()
-    cli.centered('SYSTEM STATISTICS')
-    cli.horizontalLine()
-    cli.verticalSpace(2)
+    cli.horizontalLine();
+    cli.centered('SYSTEM STATISTICS');
+    cli.horizontalLine();
+    cli.verticalSpace(2);
 
-    // log out each stat
-    for (let key in stats) {
+    // Log out each stat
+    for (var key in stats) {
         if (stats.hasOwnProperty(key)) {
-            let value = stats[key]
-            let line = '\x1b[33m' + key + '\x1b[0m'
-            let padding = 60 - line.length
-            for (let i = 0; i < padding; i++) {
-                line += ' '
+            var value = stats[key];
+            var line = '      \x1b[33m ' + key + '      \x1b[0m';
+            var padding = 60 - line.length;
+            for (i = 0; i < padding; i++) {
+                line += ' ';
             }
-            line += value
-            console.log(line)
-            cli.verticalSpace()
+            line += value;
+            console.log(line);
+            cli.verticalSpace();
         }
     }
-}
+
+    // Create a footer for the stats
+    cli.verticalSpace();
+    cli.horizontalLine();
+
+};
 
 // List Users
-cli.responders.listUsers = () => {
-    _data.list('users', (err, userIds) => {
+cli.responders.listUsers = function () {
+    _data.list('users', function (err, userIds) {
         if (!err && userIds && userIds.length > 0) {
-            cli.responders.listUsers()
-
-            userIds.forEach(userIds => {
-                _data.read('users', userIds, (err, userIds) => {
-                    if (!err && userIds) {
-                        let line = `Name: ${userIds.firstName} ${userIds.lastName} Phone: ${userIds.phone} Checks: `
-                        const numberOfChecks = typeof (userIds.checks) == 'object' && userIds.checks instanceof Array && userIds.checks.length > 0 ? userIds.checks.length : 0
-                        line += numberOfChecks
-                        console.log(line)
-                        cli.verticalSpace()
+            cli.verticalSpace();
+            userIds.forEach(function (userId) {
+                _data.read('users', userId, function (err, userData) {
+                    if (!err && userData) {
+                        var line = 'Name: ' + userData.firstName + ' ' + userData.lastName + ' Phone: ' + userData.phone + ' Checks: ';
+                        var numberOfChecks = typeof (userData.checks) == 'object' && userData.checks instanceof Array && userData.checks.length > 0 ? userData.checks.length : 0;
+                        line += numberOfChecks;
+                        console.log(line);
+                        cli.verticalSpace();
                     }
-                })
-            })
+                });
+            });
         }
-    })
-}
+    });
+};
 
-// More User Info
-cli.responders.moreUserInfo = (str) => {
-    // get the userId from the string
-    const arr = str.split('--')
-    const userId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
+// More user info
+cli.responders.moreUserInfo = function (str) {
+    // Get ID from string
+    var arr = str.split('--');
+    var userId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
     if (userId) {
-        // lookup the user
-        _data.read('users', userId, (err, userData) => {
+        // Lookup the user
+        _data.read('users', userId, function (err, userData) {
             if (!err && userData) {
-                // remove the hashed password
-                delete userData.hashedPassword
+                // Remove the hashed password
+                delete userData.hashedPassword;
 
-                // print the JSON with text highlighting
-                cli.verticalSpace()
-                console.dir(userData, { colors: true })
-                cli.verticalSpace()
-            } else {
-                console.log('Error: Could not find specified user')
+                // Print their JSON object with text highlighting
+                cli.verticalSpace();
+                console.dir(userData, { 'colors': true });
+                cli.verticalSpace();
             }
-        })
-    } else {
-        console.log('Error: You must provide a userId')
+        });
     }
-}
+
+};
 
 // List Checks
-cli.responders.listChecks = (str) => {
-    _data.list('checks', (err, checkIds) => {
+cli.responders.listChecks = function (str) {
+    _data.list('checks', function (err, checkIds) {
         if (!err && checkIds && checkIds.length > 0) {
-            cli.verticalSpace()
-            console.log(`Total Checks: ${checkIds.length}`)
-            cli.verticalSpace()
-
-            checkIds.forEach(checkId => {
-                _data.read('checks', checkId, (err, checkedId) => {
-                    const includeCheck = false
-                    const lowerString = str.toLowerCase()
-
-                    // Get the state, default to down
-                    const state = typeof (checkId.state) == 'string' ? checkId.state : 'down'
-
-                    // Get the state, default to unknown
-                    const stateOrUnknown = typeof (checkId.state) == 'string' ? checkId.state : 'unknown'
-
-                    // If the user has specified the state, or hasn't specified any state, include the check accordingly
-                    if (lowerString.indexOf('--' + state) > -1 || (lowerString.indexOf('--up') == -1 && lowerString.indexOf('--down') == -1)) {
-                        const line = `ID: ${checkId.id} Method: ${checkId.method.toUpperCase()} URL: ${checkId.protocol}://${checkId.url} State: ${stateOrUnknown} Last Checked: ${typeof (checkId.lastChecked) == 'number' && checkId.lastChecked > 0 ? new Date(checkId.lastChecked).toLocaleString() : 'Never'}`
-                        console.log(line)
-                        cli.verticalSpace()
+            cli.verticalSpace();
+            checkIds.forEach(function (checkId) {
+                _data.read('checks', checkId, function (err, checkData) {
+                    if (!err && checkData) {
+                        var includeCheck = false;
+                        var lowerString = str.toLowerCase();
+                        // Get the state, default to down
+                        var state = typeof (checkData.state) == 'string' ? checkData.state : 'down';
+                        // Get the state, default to unknown
+                        var stateOrUnknown = typeof (checkData.state) == 'string' ? checkData.state : 'unknown';
+                        // If the user has specified that state, or hasn't specified any state
+                        if ((lowerString.indexOf('--' + state) > -1) || (lowerString.indexOf('--down') == -1 && lowerString.indexOf('--up') == -1)) {
+                            var line = 'ID: ' + checkData.id + ' ' + checkData.method.toUpperCase() + ' ' + checkData.protocol + '://' + checkData.url + ' State: ' + stateOrUnknown;
+                            console.log(line);
+                            cli.verticalSpace();
+                        }
                     }
-                })
-            })
+                });
+            });
         }
-    })
-}
+    });
+};
 
-// More Check Info
-cli.responders.moreCheckInfo = () => {
-    // get the checkId from the string
-    const arr = str.split('--')
-    const checkId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
+// More check info
+cli.responders.moreCheckInfo = function (str) {
+    // Get ID from string
+    var arr = str.split('--');
+    var checkId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
     if (checkId) {
-        // lookup the check
-        _data.read('checks', checkId, (err, checkData) => {
+        // Lookup the user
+        _data.read('checks', checkId, function (err, checkData) {
             if (!err && checkData) {
-                // print the JSON with text highlighting
-                cli.verticalSpace()
-                console.dir(checkData, { colors: true })
-                cli.verticalSpace()
-            } else {
-                console.log('Error: Could not find specified check')
+
+                // Print their JSON object with text highlighting
+                cli.verticalSpace();
+                console.dir(checkData, { 'colors': true });
+                cli.verticalSpace();
             }
-        })
-    } else {
-        console.log('Error: You must provide a checkId')
+        });
     }
-}
+};
 
 // List Logs
-cli.responders.listLogs = () => {
-    _data.list(true, (err, logFileNames) => {
-        if (!err && logFileNames && logFileNames.length > 0) {
-            cli.verticalSpace()
-            console.log(`Total Logs: ${logFileNames.length}`)
-            cli.verticalSpace()
-
-            logFileNames.forEach(logFileName => {
-                if (logFileName.indexOf('-') > -1) {
-                    console.log(logFileName)
-                    cli.verticalSpace()
-                }
-            })
-        }
-    })
-}
-
-// More Log Info
-cli.responders.moreLogInfo = (str) => {
-    // get the logFileName from the string
-    const arr = str.split('--')
-    const logFileName = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false
-    if (logFileName) {
-        // lookup the log file
-        _data.decompress(logFileName, (err, strData) => {
-            if (!err && strData) {
-                // split into lines
-                const arr = strData.split('\n')
-                arr.forEach(jsonString => {
-                    const logObject = helpers.parseJsonToObject(jsonString)
-                    if (logObject && JSON.stringify(logObject) !== '{}') {
-                        console.dir(logObject, { colors: true })
-                        cli.verticalSpace()
-                    }
-                })
-            } else {
-                console.log('Error: Could not find specified log file')
+cli.responders.listLogs = function () {
+    cli.verticalSpace();
+    var ls = childProcess.spawn('ls', ['./.logs/']);
+    ls.stdout.on('data', function (dataObj) {
+        // Explode into separate lines
+        var dataStr = dataObj.toString();
+        var logFileNames = dataStr.split('\n');
+        logFileNames.forEach(function (logFileName) {
+            if (typeof (logFileName) == 'string' && logFileName.trim().length > 0 && logFileName.indexOf('-') > -1) {
+                console.log(logFileName.trim().split('.')[0]);
+                cli.verticalSpace();
             }
-        })
-    } else {
-        console.log('Error: You must provide a log file name')
+        });
+    });
+};
+
+// More logs info
+cli.responders.moreLogInfo = function (str) {
+    // Get logFileName from string
+    var arr = str.split('--');
+    var logFileName = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
+    if (logFileName) {
+        cli.verticalSpace();
+        // Decompress it
+        _logs.decompress(logFileName, function (err, strData) {
+            if (!err && strData) {
+                // Split it into lines
+                var arr = strData.split('\n');
+                arr.forEach(function (jsonString) {
+                    var logObject = helpers.parseJsonToObject(jsonString);
+                    if (logObject && JSON.stringify(logObject) !== '{}') {
+                        console.dir(logObject, { 'colors': true });
+                        cli.verticalSpace();
+                    }
+                });
+            }
+        });
     }
-}
+};
 
-// Input processors
-cli.processInput = (str) => {
-    str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : false
-
+// Input processor
+cli.processInput = function (str) {
+    str = typeof (str) == 'string' && str.trim().length > 0 ? str.trim() : false;
+    // Only process the input if the user actually wrote something, otherwise ignore it
     if (str) {
-        // codify the unique strings that identify the unique questions allowed to be asked
-        const uniqueInputs = [
+        // Codify the unique strings that identify the different unique questions allowed be the asked
+        var uniqueInputs = [
             'man',
             'help',
             'exit',
@@ -343,60 +346,58 @@ cli.processInput = (str) => {
             'more log info'
         ];
 
-        // go through the possible inputs, emit an event when a match is found
-        let matchFound = false
-        let counter = 0
-
-        uniqueInputs.some(input => {
+        // Go through the possible inputs, emit event when a match is found
+        var matchFound = false;
+        var counter = 0;
+        uniqueInputs.some(function (input) {
             if (str.toLowerCase().indexOf(input) > -1) {
-                matchFound = true
-                // emit event
-                e.emit(input, str)
-                return true
+                matchFound = true;
+                // Emit event matching the unique input, and include the full string given
+                e.emit(input, str);
+                return true;
             }
-        })
+        });
 
-        // if no match is found, tell the user to try again
+        // If no match is found, tell the user to try again
         if (!matchFound) {
-            console.log("Sorry, try again")
+            console.log("Sorry, try again");
         }
+
     }
-}
+};
 
-// init script
+// Init script
+cli.init = function () {
 
-cli.init = () => {
-    // send the start message to the console, in dark blue
-    console.log('\x1b[34m%s\x1b[0m', 'The CLI is running')
+    // Send to console, in dark blue
+    console.log('\x1b[34m%s\x1b[0m', 'The CLI is running');
 
-    // start the interface
-    const _interface = readline.createInterface({
+    // Start the interface
+    var _interface = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
         prompt: ''
-    })
+    });
 
-    // create an initial prompt
-    _interface.prompt()
+    // Create an initial prompt
+    _interface.prompt();
 
-    // handle each line of input separately
-    _interface.on('line', (str) => {
-        // send to the input processor
-        cli.processInput(str)
+    // Handle each line of input separately
+    _interface.on('line', function (str) {
 
-        // re-initialize the prompt afterwards
-        _interface.prompt()
-    })
+        // Send to the input processor
+        cli.processInput(str);
 
-    // if the user stops the CLI, kill the associated process
-    _interface.on('close', () => {
-        process.exit(0)
-    })
+        // Re-initialize the prompt afterwards
+        _interface.prompt();
+    });
 
+    // If the user stops the CLI, kill the associated process
+    _interface.on('close', function () {
+        process.exit(0);
+    });
 
-}
+};
 
-
-
-// export the module
-module.exports = cli
+// Export the module
+module.exports = cli;
