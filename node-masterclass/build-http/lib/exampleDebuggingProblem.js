@@ -1,9 +1,16 @@
-// Library that demonstrates a debugging problem
+/*
+ * Library that demonstrates something throwing when it's init() is called
+ *
+ */
 
-const example = {}
+// Container for module (to be exported)
+var example = {};
 
+// Init function
 example.init = function () {
-    const foo = bar
-}
+    // This is an error created intentionally (bar is not defined)
+    var foo = bar;
+};
 
-module.exports = example
+// Export the module
+module.exports = example;
