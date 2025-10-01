@@ -19,6 +19,26 @@ environment.staging = {
     }
 }
 
+// Testing environment
+environment.staging = {
+    'httpPort': 4000,
+    'httpsPort': 4001,
+    'envName': 'testing',
+    'hashingSecret': 'thisIsASecret',
+    'maxChecks': 5,
+    'twilio': {
+        'accountSid': '',
+        'authToken': '',
+        'fromPhone': ''
+    },
+    'templateGlobals': {
+        'appName': 'UptimeChecker',
+        'companyName': 'NotARealCompany, Inc.',
+        'yearCreated': '2025',
+        'baseUrl': 'http://localhost:4000/'
+    }
+}
+
 environment.production = {
     'httpPort': 5000,
     'httpsPort': 5001,
